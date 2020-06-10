@@ -32,7 +32,9 @@
     console.log("isBreak", isBreak);
     if (timerOn) return;
     setTimerOn(true);
-    document.getElementById("break").disabled = true;
+    document.getElementById("break").hidden = true;
+    document.getElementById("start").hidden = false;
+
     storage.setItem("currentTimer", secsRemain);
     storage.setItem("currentTimerIsBreak", isBreak);
 
@@ -51,7 +53,9 @@
       if (secsRemain == 0) {
         clearInterval(timer);
         setTimerOn(false);
-        document.getElementById("break").disabled = isBreak;
+        document.getElementById("break").hidden = isBreak;
+        document.getElementById("start").hidden = !isBreak;
+
         isBreak || incrementRecord();
         storage.removeItem("currentTimer");
       }
@@ -144,12 +148,17 @@
     padding: 0.25em;
     max-width: 500px;
   }
+
+  #break {
+    background-color: #a9dc76;
+  }
 </style>
 <body onload="onLoad()">
   <div id="time"><span id="mins">00</span>:<span id="secs">00</span></div>
   <button id="start" onclick="startTimer(25*60, false)">start</button>
+  <button id="break" onclick="startTimer(5*60, true)" hidden>break</button>
+
   <button id="end" onclick="endTimer()" disabled>end</button>
-  <button id="break" onclick="startTimer(5*60, true)" disabled>break</button>
 
   <div id="record"></div>
   <br /><br /><br />
