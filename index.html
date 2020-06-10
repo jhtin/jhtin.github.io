@@ -63,6 +63,7 @@
     clearInterval(timer);
     document.getElementById("mins").innerHTML = "00";
     document.getElementById("secs").innerHTML = "00";
+    storage.removeItem("currentTimer");
 
     setTimerOn(false);
   };
@@ -80,6 +81,8 @@
     document.getElementById("record").innerHTML = str.join("<br>");
   };
 
+  let editText;
+
   const onLoad = () => {
     resetDisplay();
     if (storage.getItem("currentTimer")) {
@@ -89,10 +92,30 @@
     if (storage.getItem("goal")) {
       document.getElementById("goal").innerHTML = storage.getItem("goal");
     }
-
+    editText = document.getElementById("goal").innerHTML;
+    console.log(editText);
     document.getElementById("goal").addEventListener("input", () => {
-      storage.setItem("goal", document.getElementById("goal").innerHTML);
+      editText = document.getElementById("goal").innerHTML;
+      storage.setItem("goal", editText);
     });
+
+    onBlur();
+  };
+
+  const onBlur = () => {
+    let text = document.getElementById("goal").innerHTML;
+    text = text.replace(
+      new RegExp("TODO", "g"),
+      (match) => `<mark style="background-color:#ff6188;">${match}</mark>`
+    );
+    document.getElementById("goal").innerHTML = text.replace(
+      new RegExp("DONE", "g"),
+      (match) => `<mark style="background-color:#a9dc76;">${match}</mark>`
+    );
+  };
+
+  const onFocus = () => {
+    document.getElementById("goal").innerHTML = editText;
   };
 </script>
 <link
@@ -131,9 +154,12 @@
   <div id="record"></div>
   <br /><br /><br />
   <b>GOALS📝</b>
-  <div id="goal" contenteditable="true">TODO:</div>
-  <br /><br /><br />
-
+  <div id="goal" contenteditable="true" onblur="onBlur()" onfocus="onFocus()">
+    TODO Finish tutorial<br />
+    DONE Write todo list
+  </div>
+  <br /><br />
+  <br />
   <button id="reset" onclick="endTimer();localStorage.clear();resetDisplay();">
     CLEAR ALL DATA
   </button>
