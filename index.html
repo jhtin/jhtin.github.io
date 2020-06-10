@@ -1,0 +1,137 @@
+<script>
+  const days = [".", "M", "T", "W", "T", "F", "."];
+  const secsIn25Mins = 2; // * 60;
+  let timerOn = false;
+  let timer;
+  // Initialise localstorage
+  const storage = window.localStorage;
+  const d = new Date();
+  const key = d.getDay();
+  console.log("key", key);
+  console.log("day", days[key]);
+
+  const incrementRecord = () => {
+    let count;
+    if (!storage.getItem(key)) {
+      count = 1;
+    } else {
+      count = Number(storage.getItem(key)) + 1;
+    }
+
+    storage.setItem(key, count);
+    resetDisplay();
+  };
+
+  const setTimerOn = (val) => {
+    timerOn = val;
+    document.getElementById("start").disabled = val;
+    document.getElementById("end").disabled = !val;
+  };
+
+  const startTimer = (secsRemain, isBreak) => {
+    console.log("isBreak", isBreak);
+    if (timerOn) return;
+    setTimerOn(true);
+    document.getElementById("break").disabled = true;
+    storage.setItem("currentTimer", secsRemain);
+    storage.setItem("currentTimerIsBreak", isBreak);
+
+    timer = setInterval(function () {
+      secsRemain--;
+      const mins = Math.floor(secsRemain / 60);
+      const secs = secsRemain % 60;
+      document.getElementById("mins").innerHTML = mins
+        .toString()
+        .padStart(2, "0");
+      document.getElementById("secs").innerHTML = secs
+        .toString()
+        .padStart(2, "0");
+
+      storage.setItem("currentTimer", secsRemain);
+
+      if (secsRemain == 0) {
+        clearInterval(timer);
+        setTimerOn(false);
+        document.getElementById("break").disabled = isBreak;
+        isBreak || incrementRecord();
+        storage.removeItem("currentTimer");
+      }
+    }, 1);
+  };
+
+  const endTimer = () => {
+    if (!timer) return;
+    clearInterval(timer);
+    document.getElementById("mins").innerHTML = "00";
+    document.getElementById("secs").innerHTML = "00";
+
+    setTimerOn(false);
+  };
+
+  const resetDisplay = () => {
+    let str = [];
+    days.forEach((e, i) => {
+      let count = Number(storage.getItem(i));
+      let countStr = count > 0 ? `(${count})`.padEnd(4, " ") : "  ";
+
+      let emojis = "🍅".repeat(Math.floor(count / 2)) + "🌱".repeat(count % 2);
+      let s = `<b>${e}</b>${countStr} ${emojis}`;
+      str.push(s);
+    });
+    document.getElementById("record").innerHTML = str.join("<br>");
+  };
+
+  const onLoad = () => {
+    resetDisplay();
+    if (storage.getItem("currentTimer")) {
+      let isBreak = storage.getItem("currentTimerIsBreak") == "true";
+      startTimer(Number(storage.getItem("currentTimer")), isBreak);
+    }
+    if (storage.getItem("goal")) {
+      document.getElementById("goal").innerHTML = storage.getItem("goal");
+    }
+
+    document.getElementById("goal").addEventListener("input", () => {
+      storage.setItem("goal", document.getElementById("goal").innerHTML);
+    });
+  };
+</script>
+<link
+  href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  * {
+    font-family: "IBM Plex Mono", monospace;
+    margin-bottom: 5px;
+    line-height: 150%;
+    color: #2a2d31;
+  }
+
+  body {
+    background-color: #eeeeee;
+  }
+
+  #time {
+    font-size: 5em;
+  }
+
+  #goal {
+    border: 1px solid #222222;
+    padding: 0.25em;
+  }
+</style>
+<body onload="onLoad()">
+  <div id="time"><span id="mins">00</span>:<span id="secs">00</span></div>
+  <button id="start" onclick="startTimer(25*60, false)">start</button>
+  <button id="end" onclick="endTimer()" disabled>end</button>
+  <button id="break" onclick="startTimer(5*60, true)" disabled>break</button>
+
+  <div id="record"></div>
+  <br /><br /><br />
+  <b>GOALS📝</b>
+  <div id="goal" contenteditable="true">TODO:</div>
+  <!--<button id="reset" onclick="endTimer();localStorage.clear();resetDisplay();">
+    RESET
+  </button>
+--></body>
