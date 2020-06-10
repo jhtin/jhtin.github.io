@@ -43,9 +43,8 @@
       document.getElementById("mins").innerHTML = mins
         .toString()
         .padStart(2, "0");
-      document.getElementById("secs").innerHTML = secs
-        .toString()
-        .padStart(2, "0");
+      document.getElementById("secs").innerHTML =
+        secs.toString().padStart(2, "0") + ` ${isBreak ? "🏖" : "💼"}`;
 
       storage.setItem("currentTimer", secsRemain);
 
@@ -105,12 +104,12 @@
     font-family: "IBM Plex Mono", monospace;
     margin-bottom: 5px;
     line-height: 150%;
-    color: #2a2d31;
   }
 
   body {
     background-color: #eeeeee;
     padding: 1em;
+    color: #2a2d31;
   }
 
   #time {
