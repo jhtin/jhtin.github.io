@@ -79,7 +79,7 @@
       let countStr = count > 0 ? `(${count})`.padEnd(4, " ") : "  ";
 
       let emojis = "🍅".repeat(Math.floor(count / 2)) + "🌱".repeat(count % 2);
-      let s = `<b>${e}</b>${countStr} ${emojis}`;
+      let s = `<b>${e}</b>${countStr}${emojis}`;
       str.push(s);
     });
     document.getElementById("record").innerHTML = str.join("<br>");
